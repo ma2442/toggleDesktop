@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace toggleDesktop
 {
-    public class InterceptInput
+    public static class InterceptInput
     {
         #region Win32API Structures
         [StructLayout(LayoutKind.Sequential)]
@@ -78,7 +78,7 @@ namespace toggleDesktop
         public static readonly UIntPtr MAGIC_NUMBER = (UIntPtr)0x10209;
         #endregion
 
-        public INPUT KeyDown(int key, bool isExtend = false)
+        public static INPUT KeyDown(int key, bool isExtend = false)
         {
             INPUT input = new INPUT
             {
@@ -99,7 +99,7 @@ namespace toggleDesktop
             return input;
         }
 
-        public void KeyUp(INPUT input, bool isExtend = false)
+        public static void KeyUp(INPUT input, bool isExtend = false)
         {
             input.ipt.ki.dwFlags = ((isExtend) ? (KEYEVENTF_EXTENDEDKEY) : 0x0) | KEYEVENTF_KEYUP;
             SendInput(1, ref input, Marshal.SizeOf(input));

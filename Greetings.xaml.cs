@@ -16,6 +16,9 @@ using System.Windows.Shapes;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Reflection.Emit;
+using static toggleDesktop.Keys;
+using static toggleDesktop.InterceptInput;
+
 namespace toggleDesktop
 {
 
@@ -36,14 +39,15 @@ namespace toggleDesktop
 
         }
 
-        private void showLog(string log){
+        private void showLog(string log)
+        {
             Log.Text = log;
         }
 
         #region CONST
         private const int VK_WIN = 91;
         private const int VK_TAB = 9;
-       private const int VK_CONTROL = 0x11;
+        private const int VK_CONTROL = 0x11;
         private const int VK_ALT = 164;
         private const int VK_LEFT = 0x25;
         private const int VK_RIGHT = 0x27;
@@ -58,11 +62,11 @@ namespace toggleDesktop
         private int curKeyCode = -1;
 
 
-        
+
 
         private void showWinBtnState()
         {
-            IsWinBtnPressed.Background = winKeyIsDown ? System.Windows.Media.Brushes.Lime: System.Windows.Media.Brushes.DarkGreen;
+            IsWinBtnPressed.Background = winKeyIsDown ? System.Windows.Media.Brushes.Lime : System.Windows.Media.Brushes.DarkGreen;
         }
 
         /// <summary>
@@ -90,41 +94,37 @@ namespace toggleDesktop
                 && curKeyEvent == KeyEvent.Up && curKeyCode == VK_WIN)
             {
                 showLog("WIN!!!!!!!!!!!");
-                var interceptInput = new InterceptInput();
-                var winInput = interceptInput.KeyDown(VK_WIN);
-                var ctrlInput = interceptInput.KeyDown(VK_CONTROL);
-                var arrowInput = interceptInput.KeyDown(VK_LEFT);
-                interceptInput.KeyUp(arrowInput);
-                interceptInput.KeyUp(ctrlInput);
-                interceptInput.KeyUp(winInput);
+                MoveDesktopLeft();
+            }
+            else if (winKeyIsDown && prevKeyEvent == KeyEvent.Down && prevKeyCode == VK_ALT
+                    && curKeyEvent == KeyEvent.Up && curKeyCode == VK_ALT)
+            {
+                MoveDesktopRight();
             }
         }
 
-        private void InterceptKeyboard_KeyUpEvent(object sender, InterceptKeyboard.OriginalKeyEventArg e)
+        private IntPtr InterceptKeyboard_KeyUpEvent(object sender, InterceptKeyboard.OriginalKeyEventArg e)
         {
             recordKeyEvent(e, KeyEvent.Up);
             var log = String.Format("Keyup KeyCode {0}", e.KeyCode);
             showLog(log);
-            if (e.KeyCode == VK_WIN)
-            {
-                winKeyIsDown = false;
-            }
+            if (e.KeyCode == VK_WIN) winKeyIsDown = false;
             showWinBtnState();
             judgeWinSingleUpDownEvent();
-
+            return IntPtr.Zero;
+            return (IntPtr)200;
         }
 
-        private void InterceptKeyboard_KeyDownEvent(object sender, InterceptKeyboard.OriginalKeyEventArg e)
+        private IntPtr InterceptKeyboard_KeyDownEvent(object sender, InterceptKeyboard.OriginalKeyEventArg e)
         {
             recordKeyEvent(e, KeyEvent.Down);
             var log = String.Format("Keydown KeyCode {0}", e.KeyCode);
             showLog(log);
-            if (e.KeyCode == VK_WIN)
-            {
-                winKeyIsDown = true;
-            }
+            if (e.KeyCode == VK_WIN) winKeyIsDown = true;
             showWinBtnState();
             judgeWinSingleUpDownEvent();
+            return IntPtr.Zero;
+            return (IntPtr)200;
         }
 
         ~MainWindow()
@@ -135,31 +135,18 @@ namespace toggleDesktop
 
         private void WinButton_Click(object sender, RoutedEventArgs e)
         {
-            var interceptInput = new InterceptInput();
-            var winInput = interceptInput.KeyDown(VK_WIN);
-            interceptInput.KeyUp(winInput);
+            var winInput = InterceptInput.KeyDown(VK_WIN);
+            InterceptInput.KeyUp(winInput);
         }
 
         private void DesktopMoveLeftButton_Click(object sender, RoutedEventArgs e)
         {
-            var interceptInput = new InterceptInput();
-            var winInput = interceptInput.KeyDown(VK_WIN);
-            var ctrlInput = interceptInput.KeyDown(VK_CONTROL);
-            var arrowInput = interceptInput.KeyDown(VK_LEFT);
-            interceptInput.KeyUp(arrowInput);
-            interceptInput.KeyUp(ctrlInput);
-            interceptInput.KeyUp(winInput);
+            MoveDesktopLeft();
         }
 
         private void DesktopMoveRightButton_Click(object sender, RoutedEventArgs e)
         {
-            var interceptInput = new InterceptInput();
-            var winInput = interceptInput.KeyDown(VK_WIN);
-            var ctrlInput = interceptInput.KeyDown(VK_CONTROL);
-            var arrowInput = interceptInput.KeyDown(VK_RIGHT);
-            interceptInput.KeyUp(arrowInput);
-            interceptInput.KeyUp(ctrlInput);
-            interceptInput.KeyUp(winInput);
+            MoveDesktopRight();
         }
     }
 }

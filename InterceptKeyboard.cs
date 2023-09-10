@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
-
-
+using static toggleDesktop.InterceptInput;
 
 abstract class AbstractInterceptKeyboard
 {
@@ -102,39 +102,41 @@ class InterceptKeyboard : AbstractInterceptKeyboard
         }
 
     }
-    public delegate void KeyEventHandler(object sender, OriginalKeyEventArg e);
+    public delegate IntPtr KeyEventHandler(object sender, OriginalKeyEventArg e);
     public event KeyEventHandler KeyDownEvent;
     public event KeyEventHandler KeyUpEvent;
 
-    protected void OnKeyDownEvent(int keyCode)
+    protected IntPtr OnKeyDownEvent(int keyCode)
     {
-        KeyDownEvent?.Invoke(this, new OriginalKeyEventArg(keyCode));
+        return (IntPtr)KeyDownEvent?.Invoke(this, new OriginalKeyEventArg(keyCode));
     }
-    protected void OnKeyUpEvent(int keyCode)
+    protected IntPtr OnKeyUpEvent(int keyCode)
     {
-        KeyUpEvent?.Invoke(this, new OriginalKeyEventArg(keyCode));
+        return (IntPtr)KeyUpEvent?.Invoke(this, new OriginalKeyEventArg(keyCode));
     }
     #endregion
 
 
     public override IntPtr HookProcedure(int nCode, IntPtr wParam, IntPtr lParam)
     {
-        if (nCode >= 0 && (wParam == (IntPtr)WM_KEYDOWN || wParam == (IntPtr)WM_SYSKEYDOWN))
-        {
-            var kb = (KBDLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(KBDLLHOOKSTRUCT));
-            var vkCode = (int)kb.vkCode;
-            OnKeyDownEvent(vkCode);
+        var kb = (KBDLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(KBDLLHOOKSTRUCT));
+        var vkCode = (int)kb.vkCode;
 
-        }
-        else if (nCode >= 0 && (wParam == (IntPtr)WM_KEYUP || wParam == (IntPtr)WM_SYSKEYUP))
-        {
-            var kb = (KBDLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(KBDLLHOOKSTRUCT));
-            var vkCode = (int)kb.vkCode;
-            OnKeyUpEvent(vkCode);
-        }
+        // nCodeマイナスは何を意味する？
+        // ハードキーボードによる入力でない場合フック素通りさせる
+        if (nCode < 0 || kb.dwExtraInfo != (UIntPtr)0)
+            return base.HookProcedure(nCode, wParam, lParam);
+
+        var retCode = IntPtr.Zero;
+        if (wParam == (IntPtr)WM_KEYDOWN || wParam == (IntPtr)WM_SYSKEYDOWN)
+            retCode = OnKeyDownEvent(vkCode);
+        else if (wParam == (IntPtr)WM_KEYUP || wParam == (IntPtr)WM_SYSKEYUP)
+            retCode = OnKeyUpEvent(vkCode);
+        
+        if (retCode != IntPtr.Zero)
+            return retCode;
+
         return base.HookProcedure(nCode, wParam, lParam);
     }
-
-
 
 }
