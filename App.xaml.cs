@@ -15,7 +15,7 @@ namespace switchDesktops
     public partial class App : Application
     {
 
-
+        System.Windows.Forms.NotifyIcon notifyIcon;
         /// <summary>
         /// アプリケーションが終了する時のイベント。
         /// </summary>
@@ -25,6 +25,7 @@ namespace switchDesktops
         {
             base.OnExit(e);
             EndKeyListen();
+            notifyIcon.Dispose();
         }
 
         /// <summary>
@@ -41,7 +42,7 @@ namespace switchDesktops
             menu.Items.Add("終了", null, Exit_Click);
             menu.Items.Add("<-", null, (object sender, EventArgs e) => MoveDesktopLeft());
             menu.Items.Add("->", null, (object sender, EventArgs e) => MoveDesktopRight());
-            var notifyIcon = new System.Windows.Forms.NotifyIcon
+            notifyIcon = new System.Windows.Forms.NotifyIcon
             {
                 Visible = true,
                 Icon = new System.Drawing.Icon(icon),
@@ -71,6 +72,7 @@ namespace switchDesktops
 
         private void Exit_Click(object sender, EventArgs e)
         {
+            OnExit(null);
             Shutdown();
         }
     }
