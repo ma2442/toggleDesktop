@@ -1,9 +1,9 @@
-﻿<Window x:Class="toggleDesktop.MainWindow"
+﻿<Window x:Class="switchDesktops.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:toggleDesktop"
+        xmlns:local="clr-namespace:switchDesktops"
         mc:Ignorable="d"
         Title="デスクトップきりかえーる" Height="161" Width="300"
         Background="Tan" Opacity="1">

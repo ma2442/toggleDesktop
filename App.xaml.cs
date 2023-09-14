@@ -5,9 +5,9 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using static toggleDesktop.Keys;
+using static switchDesktops.Keys;
 
-namespace toggleDesktop
+namespace switchDesktops
 {
     /// <summary>
     /// App.xaml の相互作用ロジック

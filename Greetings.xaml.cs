@@ -16,10 +16,10 @@ using System.Windows.Shapes;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Reflection.Emit;
-using static toggleDesktop.Keys;
-using static toggleDesktop.InterceptInput;
+using static switchDesktops.Keys;
+using static switchDesktops.InterceptInput;
 
-namespace toggleDesktop
+namespace switchDesktops
 {
 
     /// <summary>
