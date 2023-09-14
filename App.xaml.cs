@@ -37,10 +37,10 @@ namespace switchDesktops
             BeginKeyListen();
             var icon = GetResourceStream(new Uri("icon.ico", UriKind.Relative)).Stream;
             var menu = new System.Windows.Forms.ContextMenuStrip();
-            menu.Items.Add("<-", null, (object sender, EventArgs e) => MoveDesktopLeft());
-            menu.Items.Add("->", null, (object sender, EventArgs e) => MoveDesktopRight());
             menu.Items.Add("ウィンドウ表示", null, (object sender, EventArgs e) => Show_MainWindow());
             menu.Items.Add("終了", null, Exit_Click);
+            menu.Items.Add("<-", null, (object sender, EventArgs e) => MoveDesktopLeft());
+            menu.Items.Add("->", null, (object sender, EventArgs e) => MoveDesktopRight());
             var notifyIcon = new System.Windows.Forms.NotifyIcon
             {
                 Visible = true,
