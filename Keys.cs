@@ -120,7 +120,10 @@ namespace switchDesktops
         }
 
         static InterceptKeyboard interceptKeyboard;
-        public static void BeginFunc()
+        /// <summary>
+        /// フック開始とイベント登録
+        /// </summary>
+        public static void BeginKeyListen()
         {
             interceptKeyboard = new InterceptKeyboard();
             interceptKeyboard.KeyDownEvent += InterceptKeyboard_KeyDownEvent;
@@ -128,7 +131,10 @@ namespace switchDesktops
             interceptKeyboard.Hook();
         }
 
-        public static void EndFunc()
+        /// <summary>
+        /// キーフック終了
+        /// </summary>
+        public static void EndKeyListen()
         {
             interceptKeyboard.UnHook();
         }

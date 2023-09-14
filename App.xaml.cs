@@ -24,7 +24,7 @@ namespace switchDesktops
         protected override void OnExit(ExitEventArgs e)
         {
             base.OnExit(e);
-            EndFunc();
+            EndKeyListen();
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace switchDesktops
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-            BeginFunc();
+            BeginKeyListen();
             var icon = GetResourceStream(new Uri("icon.ico", UriKind.Relative)).Stream;
             var menu = new System.Windows.Forms.ContextMenuStrip();
             menu.Items.Add("<-", null, (object sender, EventArgs e) => MoveDesktopLeft());
