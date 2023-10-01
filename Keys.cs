@@ -27,15 +27,13 @@ namespace switchDesktops
 
         public enum KeyEvent { Up, Down };
         #endregion
+        public static bool[] isDown = new bool[512];
+        // 直近の有効なキーボード操作
+        public static (int code, KeyEvent e) curActualKeyOperation = (-1, KeyEvent.Up);
+        public static (int code, KeyEvent e) prevActualKeyOperation = (-1, KeyEvent.Up);
 
-        public static bool winKeyIsDown = false;
-        //public static bool altKeyIsDown = false;
-        //public static bool shiftKeyIsDown = false;
-        //public static bool ctrlKeyIsDown = false;
-        public static KeyEvent prevKeyEvent = KeyEvent.Up;
-        public static KeyEvent curKeyEvent = KeyEvent.Up;
-        public static int prevKeyCode = -1;
-        public static int curKeyCode = -1;
+        public static (int code, KeyEvent e) curKey = (-1, KeyEvent.Up);
+        public static (int code, KeyEvent e) prevKey = (-1, KeyEvent.Up);
 
 
         /// <summary>
@@ -86,37 +84,18 @@ namespace switchDesktops
         /// <param name="ke"></param>
         public static void RecordKeyEvent(int keyCode, Keys.KeyEvent keyEvent)
         {
-            prevKeyCode = curKeyCode;
-            curKeyCode = keyCode;
+            prevKey = curKey;
+            curKey = (keyCode, keyEvent);
 
-            prevKeyEvent = curKeyEvent;
-            curKeyEvent = keyEvent;
+            // 実際のキー操作を記憶 押しっぱなし以外が該当
+            if (!(isDown[curKey.code] && curKey.e == KeyEvent.Down))
+            {
+                prevActualKeyOperation = curActualKeyOperation;
+                curActualKeyOperation = curKey;
+            }
 
             // キー状態
-            switch (curKeyCode)
-            {
-                case VK_WIN:
-                    if (curKeyEvent == KeyEvent.Down) winKeyIsDown = true;
-                    if (curKeyEvent == KeyEvent.Up) winKeyIsDown = false;
-                    break;
-                //case VK_ALT_L:
-                //case VK_ALT_R:
-                //    if (curKeyEvent == KeyEvent.Down) altKeyIsDown = true;
-                //    if (curKeyEvent == KeyEvent.Up) altKeyIsDown = false;
-                //break;
-                //case VK_SHIFT_L:
-                //case VK_SHIFT_R:
-                //    if (curKeyEvent == KeyEvent.Down) shiftKeyIsDown = true;
-                //    if (curKeyEvent == KeyEvent.Up) shiftKeyIsDown = false;
-                //    break;
-                //case VK_CTRL_L:
-                //case VK_CTRL_R:
-                //    if (curKeyEvent == KeyEvent.Down) ctrlKeyIsDown = true;
-                //    if (curKeyEvent == KeyEvent.Up) ctrlKeyIsDown = false;
-                //    break;
-                default:
-                    break;
-            }
+            isDown[curKey.code] = Convert.ToBoolean(curKey.e);
         }
 
         static InterceptKeyboard interceptKeyboard;
@@ -159,16 +138,14 @@ namespace switchDesktops
         {
             // winキーが押下されたらデスクトップを一つ左に切り替える(win + ctrl + ←)。 
             // デスクトップ２であそび、緊急時にデスクトップ１で仕事に切り替える運用を想定。
-            if (curKeyEvent == KeyEvent.Up && curKeyCode == VK_WIN)
+
+            if (curActualKeyOperation == (VK_WIN, KeyEvent.Up) && prevActualKeyOperation == (VK_WIN, KeyEvent.Down))
             {
-                if (prevKeyEvent == KeyEvent.Down && prevKeyCode == VK_WIN)
-                {
-                    MoveDesktopLeft();
-                    // ここでゼロ以外を返せばフックされた文字は出力されない。
-                    // 現段階では不都合もないので、ゼロを返すことで、
-                    // Winキーもそのまま出力してしまっている。
-                    return IntPtr.Zero;
-                }
+                MoveDesktopLeft();
+                // ここでゼロ以外を返せばフックされた文字は出力されない。
+                // 現段階では不都合もないので、ゼロを返すことで、
+                // Winキーもそのまま出力してしまっている。
+                return IntPtr.Zero;
             }
             return IntPtr.Zero;
         }

@@ -28,11 +28,17 @@ namespace switchDesktops
     public partial class MainWindow : Window
     {
 
+        private void updateDataContext(){
+            this.DataContext = new { lastActuralKeyOperationContext = "実際のキー操作：" + Keys.curActualKeyOperation + Keys.prevActualKeyOperation };
+
+        }
+
         public MainWindow()
         {
             InitializeComponent();
             AddKeyDownEvent(InterceptKeyboard_KeyDownEvent);
             AddKeyUpEvent(InterceptKeyboard_KeyUpEvent);
+            updateDataContext();
         }
 
 
@@ -40,6 +46,7 @@ namespace switchDesktops
         {
             Log.Text = log + " " + Log.Text;
             if (Log.Text.Length > 255) Log.Text = Log.Text[..255];
+            updateDataContext();
         }
 
         #region CONST
@@ -88,17 +95,6 @@ namespace switchDesktops
         {
             // winキーが押下されたらデスクトップを一つ左に切り替える(win + ctrl + ←)。 
             // デスクトップ２であそび、緊急時にデスクトップ１で仕事に切り替える運用を想定。
-            if (prevKeyEvent == KeyEvent.Down && prevKeyCode == VK_WIN
-                && curKeyEvent == KeyEvent.Up && curKeyCode == VK_WIN)
-            {
-                showLog("WIN! ");
-                MoveDesktopLeft();
-            }
-            else if (winKeyIsDown && prevKeyEvent == KeyEvent.Down && prevKeyCode == VK_ALT
-                    && curKeyEvent == KeyEvent.Up && curKeyCode == VK_ALT)
-            {
-                MoveDesktopRight();
-            }
         }
 
         private IntPtr InterceptKeyboard_KeyUpEvent(object sender, InterceptKeyboard.OriginalKeyEventArg e)
