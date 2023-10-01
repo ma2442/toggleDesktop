@@ -4,7 +4,7 @@ using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
 using static switchDesktops.InterceptInput;
 
-abstract class AbstractInterceptKeyboard
+abstract public class AbstractInterceptKeyboard
 {
     #region Win32 Constants
     protected const int WH_KEYBOARD_LL = 0x000D;
@@ -89,7 +89,7 @@ abstract class AbstractInterceptKeyboard
 
 }
 
-class InterceptKeyboard : AbstractInterceptKeyboard
+public class InterceptKeyboard : AbstractInterceptKeyboard
 {
     #region InputEvent
     public class OriginalKeyEventArg : EventArgs

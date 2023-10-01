@@ -132,6 +132,19 @@ namespace switchDesktops
         }
 
         /// <summary>
+        /// 外部からキーイベントを追加する用の関数 AddKeyDownEvent, AddKeyUpEvent
+        /// </summary>
+        /// <param name="e"></param>
+        public static void AddKeyDownEvent(InterceptKeyboard.KeyEventHandler e)
+        {
+            interceptKeyboard.KeyDownEvent += e;
+        }
+        public static void AddKeyUpEvent(InterceptKeyboard.KeyEventHandler e)
+        {
+            interceptKeyboard.KeyUpEvent += e;
+        }
+
+        /// <summary>
         /// キーフック終了
         /// </summary>
         public static void EndKeyListen()

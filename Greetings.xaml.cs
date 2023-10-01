@@ -27,17 +27,14 @@ namespace switchDesktops
     /// </summary>
     public partial class MainWindow : Window
     {
-        InterceptKeyboard interceptKeyboard;
 
         public MainWindow()
         {
             InitializeComponent();
-            interceptKeyboard = new InterceptKeyboard();
-            interceptKeyboard.KeyDownEvent += InterceptKeyboard_KeyDownEvent;
-            interceptKeyboard.KeyUpEvent += InterceptKeyboard_KeyUpEvent;
-            interceptKeyboard.Hook();
-
+            AddKeyDownEvent(InterceptKeyboard_KeyDownEvent);
+            AddKeyUpEvent(InterceptKeyboard_KeyUpEvent);
         }
+
 
         private void showLog(string log)
         {
@@ -129,7 +126,7 @@ namespace switchDesktops
 
         ~MainWindow()
         {
-            interceptKeyboard.UnHook();
+            EndKeyListen();
         }
 
 
