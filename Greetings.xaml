@@ -12,7 +12,7 @@
             <ColumnDefinition Width="0.5*"/>
             <ColumnDefinition Width="0.5*"/>
         </Grid.ColumnDefinitions>
-        <TextBlock x:Name="Log" TextWrapping="Wrap" Text="ここにログが表示されます" Margin="0,69,0,0" Height="33" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Center" Width="130"/>
+        <TextBlock x:Name="Log" TextWrapping="Wrap" Text="ここにログが表示されます" Margin="0,69,0,0" Height="130" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Center" Width="130"/>
         <Button x:Name="WinButton" Content="田" HorizontalAlignment="Left" Margin="66,70,0,0" Click="WinButton_Click" Width="74" RenderTransformOrigin="0,0" Height="34" VerticalAlignment="Top" Grid.Column="1"/>
         <Label x:Name="IsWinBtnPressed" Content="WIN" HorizontalAlignment="Left" Margin="10,70,0,0" VerticalAlignment="Top" Background="DarkGreen" BorderBrush="Black" BorderThickness="0" Height="34" Width="51" Grid.Column="1" />
         <Button x:Name="DesktopMoveLeftButton" Content="← L" Click="DesktopMoveLeftButton_Click" Grid.Column="0" Height="50" Width="135"  VerticalAlignment="Top" HorizontalAlignment="Center"  Margin="0,10,0,0"/>

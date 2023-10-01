@@ -38,7 +38,8 @@ namespace switchDesktops
 
         private void showLog(string log)
         {
-            Log.Text = log;
+            Log.Text = log + " " + Log.Text;
+            if (Log.Text.Length > 255) Log.Text = Log.Text[..255];
         }
 
         #region CONST
@@ -90,7 +91,7 @@ namespace switchDesktops
             if (prevKeyEvent == KeyEvent.Down && prevKeyCode == VK_WIN
                 && curKeyEvent == KeyEvent.Up && curKeyCode == VK_WIN)
             {
-                showLog("WIN!!!!!!!!!!!");
+                showLog("WIN! ");
                 MoveDesktopLeft();
             }
             else if (winKeyIsDown && prevKeyEvent == KeyEvent.Down && prevKeyCode == VK_ALT
@@ -103,7 +104,7 @@ namespace switchDesktops
         private IntPtr InterceptKeyboard_KeyUpEvent(object sender, InterceptKeyboard.OriginalKeyEventArg e)
         {
             recordKeyEvent(e, KeyEvent.Up);
-            var log = String.Format("Keyup KeyCode {0}", e.KeyCode);
+            var log = String.Format("{0}up ", e.KeyCode);
             showLog(log);
             if (e.KeyCode == VK_WIN) winKeyIsDown = false;
             showWinBtnState();
@@ -115,8 +116,14 @@ namespace switchDesktops
         private IntPtr InterceptKeyboard_KeyDownEvent(object sender, InterceptKeyboard.OriginalKeyEventArg e)
         {
             recordKeyEvent(e, KeyEvent.Down);
-            var log = String.Format("Keydown KeyCode {0}", e.KeyCode);
-            showLog(log);
+            if (prevKeyCode == curKeyCode && prevKeyEvent == curKeyEvent)
+            {
+                showLog(".");
+            }
+            else
+            {
+                showLog(String.Format("{0} ", e.KeyCode));
+            }
             if (e.KeyCode == VK_WIN) winKeyIsDown = true;
             showWinBtnState();
             judgeWinSingleUpDownEvent();
