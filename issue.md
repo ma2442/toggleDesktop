@@ -2,6 +2,7 @@
 # ToDo
 
 # Done
+- [x] Ctrl + Win のコンビネーションはホームポジションでは使いにくいので、発動条件をShift + Win に変更する。
 - [x] Ctrl + Win または Win + Ctrl で Win + Ctrl + Right をソフト入力するようにする
 - [x] Ctrl, Alt, Shift が押されている場合にWin単一押し機能が働かないようにする
 - [x] 実際のキーボード操作を記憶し、押しっぱなしによるキーDownイベントと区別するように変更

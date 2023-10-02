@@ -59,22 +59,18 @@ namespace switchDesktops
 
         public static void MoveDesktopLeft()
         {
-            var winInput = KeyDown(VK_WIN);
-            var ctrlInput = KeyDown(VK_CTRL_L);
-            var arrowInput = KeyDown(VK_LEFT);
-            KeyUp(arrowInput);
-            KeyUp(ctrlInput);
-            KeyUp(winInput);
+            var s = new Stack<INPUT>();
+            var keys = new int[] { VK_WIN, VK_CTRL_L, VK_LEFT };
+            foreach (int k in keys) s.Push(KeyDown(k));
+            while (s.Count > 0) KeyUp(s.Pop());
         }
 
         public static void MoveDesktopRight()
         {
-            var winInput = KeyDown(VK_WIN);
-            var ctrlInput = KeyDown(VK_CTRL_L);
-            var arrowInput = KeyDown(VK_RIGHT);
-            KeyUp(arrowInput);
-            KeyUp(ctrlInput);
-            KeyUp(winInput);
+            var s = new Stack<INPUT>();
+            var keys = new int[] { VK_WIN, VK_CTRL_L, VK_RIGHT };
+            foreach (int k in keys) s.Push(KeyDown(k));
+            while (s.Count > 0) KeyUp(s.Pop());
         }
 
         /// <summary>
@@ -174,17 +170,24 @@ namespace switchDesktops
         /// Ctrl + Win 押下を検知してWin+Ctrl+Rightをソフト入力する関数
         /// </summary>
         /// <returns></returns>
-        private static bool convertWinCtrlCombination()
+        private static bool convertWinShiftCombination()
         {
-            if (!AltIsDown() && !ShiftIsDown())
+            if (!AltIsDown() && !CtrlIsDown())
             {
-                if ((!CtrlIsDown() && isDown[VK_WIN])
-                    && (wasPressedJustNow(VK_CTRL_L) || wasPressedJustNow(VK_CTRL_R)))
+                if ((!ShiftIsDown() && isDown[VK_WIN])
+                    && (wasPressedJustNow(VK_SHIFT_L) || wasPressedJustNow(VK_SHIFT_R)))
                 {
+                    // フックされたShift Upがまだ出力されておらずシステムとしては
+                    // Shift Downのままになっているので、先にクリアしておく。
+                    KeyUp(KeyDown(VK_SHIFT_L));
+                    KeyUp(KeyDown(VK_SHIFT_R));
                     MoveDesktopRight();
                 }
-                else if (CtrlIsDown() && wasPressedJustNow(VK_WIN))
+                else if (ShiftIsDown() && wasPressedJustNow(VK_WIN))
                 {
+                    // Shift Downをクリアしておく。
+                    KeyUp(KeyDown(VK_SHIFT_L));
+                    KeyUp(KeyDown(VK_SHIFT_R));
                     MoveDesktopRight();
                 }
                 return true;
@@ -199,7 +202,7 @@ namespace switchDesktops
         private static IntPtr convertInput()
         {
             if (convertWinSingleDownUp()) return IntPtr.Zero;
-            if (convertWinCtrlCombination()) return IntPtr.Zero;
+            if (convertWinShiftCombination()) return IntPtr.Zero;
             return IntPtr.Zero;
         }
 
