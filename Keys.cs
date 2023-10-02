@@ -131,35 +131,88 @@ namespace switchDesktops
             interceptKeyboard.UnHook();
         }
 
+        private static bool wasPressedJustNow(int keyCode)
+        {
+            return curActualKeyOperation == (keyCode, KeyEvent.Up) && prevActualKeyOperation == (keyCode, KeyEvent.Down);
+        }
+
+        private static bool CtrlIsDown()
+        {
+            return isDown[VK_CTRL_R] || isDown[VK_CTRL_L];
+        }
+
+        private static bool AltIsDown()
+        {
+            return isDown[VK_ALT_R] || isDown[VK_ALT_L];
+        }
+
+        private static bool ShiftIsDown()
+        {
+            return isDown[VK_SHIFT_R] || isDown[VK_SHIFT_L];
+        }
+
         /// <summary>
         /// windowsキー単独押下を判定する関数
         /// </summary>
-        private static IntPtr judgeWinSingleUpDownEvent()
+        private static bool convertWinSingleDownUp()
         {
             // winキーが押下されたらデスクトップを一つ左に切り替える(win + ctrl + ←)。 
             // デスクトップ２であそび、緊急時にデスクトップ１で仕事に切り替える運用を想定。
 
-            if (curActualKeyOperation == (VK_WIN, KeyEvent.Up) && prevActualKeyOperation == (VK_WIN, KeyEvent.Down))
+            if (wasPressedJustNow(VK_WIN) && !CtrlIsDown() && !AltIsDown() && !ShiftIsDown())
             {
                 MoveDesktopLeft();
                 // ここでゼロ以外を返せばフックされた文字は出力されない。
                 // 現段階では不都合もないので、ゼロを返すことで、
                 // Winキーもそのまま出力してしまっている。
-                return IntPtr.Zero;
+                return true;
             }
+            return false;
+        }
+
+        /// <summary>
+        /// Ctrl + Win 押下を検知してWin+Ctrl+Rightをソフト入力する関数
+        /// </summary>
+        /// <returns></returns>
+        private static bool convertWinCtrlCombination()
+        {
+            if (!AltIsDown() && !ShiftIsDown())
+            {
+                if ((!CtrlIsDown() && isDown[VK_WIN])
+                    && (wasPressedJustNow(VK_CTRL_L) || wasPressedJustNow(VK_CTRL_R)))
+                {
+                    MoveDesktopRight();
+                }
+                else if (CtrlIsDown() && wasPressedJustNow(VK_WIN))
+                {
+                    MoveDesktopRight();
+                }
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 入力内容を変換する関数
+        /// </summary>
+        /// <returns></returns>
+        private static IntPtr convertInput()
+        {
+            if (convertWinSingleDownUp()) return IntPtr.Zero;
+            if (convertWinCtrlCombination()) return IntPtr.Zero;
             return IntPtr.Zero;
         }
 
         private static IntPtr InterceptKeyboard_KeyUpEvent(object sender, InterceptKeyboard.OriginalKeyEventArg e)
         {
             RecordKeyEvent(e.KeyCode, KeyEvent.Up);
-            return judgeWinSingleUpDownEvent();
+            return convertInput();
         }
 
         private static IntPtr InterceptKeyboard_KeyDownEvent(object sender, InterceptKeyboard.OriginalKeyEventArg e)
         {
             RecordKeyEvent(e.KeyCode, KeyEvent.Down);
-            return judgeWinSingleUpDownEvent();
+            return convertInput();
         }
 
     }
